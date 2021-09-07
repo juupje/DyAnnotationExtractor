@@ -12,6 +12,7 @@ public class AnnotatedDocument implements Serializable {
 	protected String title;
     protected String subject;
     protected String author;
+    protected int pages;
     protected List<String> keywords;
     protected List<Annotation> annotations;
 
@@ -43,6 +44,14 @@ public class AnnotatedDocument implements Serializable {
         this.author = author;
     }
 
+    public int getNumberOfPages() {
+    	return pages;
+    }
+    
+    public void setNumberOfPages(int pages) {
+    	this.pages = pages;
+    }
+    
     public List<Annotation> getAnnotations() {
         if (annotations == null) {
             annotations = new LinkedList<>();

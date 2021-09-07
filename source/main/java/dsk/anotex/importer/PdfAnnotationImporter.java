@@ -69,6 +69,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         document.setTitle(pdfInfo.getTitle());
         document.setSubject(pdfInfo.getSubject());
         document.setAuthor(pdfInfo.getAuthor());
+        document.setNumberOfPages(pdfDocument.getNumberOfPages());
         List<String> keywords = convertToKeywords(pdfInfo.getKeywords());
         document.setKeywords(keywords);
 
