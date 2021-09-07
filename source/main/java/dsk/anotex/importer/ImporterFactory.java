@@ -19,15 +19,13 @@ public class ImporterFactory {
      * @return Importer instance for this format.
      */
     public static AnnotationImporter createImporter(FileFormat format) {
-        AnnotationImporter importer;
-        if (FileFormat.PDF == format) {
-            importer = new PdfAnnotationImporter();
+        switch(format) {
+        case PDF:
+        	return new PdfAnnotationImporter();
+        default:
+        	String message = String.format("Unsupported import format '%s'", format);
+        	throw new IllegalArgumentException(message);
         }
-        else {
-            String message = String.format("Unsupported import format '%s'", format);
-            throw new IllegalArgumentException(message);
-        }
-        return importer;
     }
 
 }

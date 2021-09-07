@@ -19,15 +19,14 @@ public class ExporterFactory {
      * @return Exporter instance for this format.
      */
     public static AnnotationExporter createExporter(FileFormat format) {
-        AnnotationExporter exporter;
-        if (FileFormat.MARKDOWN == format) {
-            exporter = new MarkdownExporter();
+        switch(format) {
+        case MARKDOWN:
+            return new MarkdownExporter();
+        case TEXT:
+        	return new PlainTextExporter();
+        default:
+        		String message = String.format("Unsupported export format '%s'", format);
+        		throw new IllegalArgumentException(message);
         }
-        else {
-            String message = String.format("Unsupported export format '%s'", format);
-            throw new IllegalArgumentException(message);
-        }
-        return exporter;
     }
-
 }

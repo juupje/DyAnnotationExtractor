@@ -1,5 +1,6 @@
 package dsk.anotex;
 
+import dsk.anotex.core.FileFormat;
 import dsk.anotex.util.CommandLineParser;
 
 import java.util.HashMap;
@@ -87,6 +88,7 @@ public class ConsoleRunner {
             HashMap<String, Object> settings = new HashMap<>();
             // Retrieve the output file name.
             String outputFile = parser.getArgumentValue(ARG_OUTPUT);
+            settings.put(Constants.EXPORT_FORMAT, FileFormat.detectFileFormat(outputFile));
             // Execute the annotation extraction.
             runner.doExtract(inputFile, settings, outputFile);
         }

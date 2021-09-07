@@ -8,7 +8,8 @@ import java.util.List;
  * Represents annotated document. It is independent from the original document format.
  */
 public class AnnotatedDocument implements Serializable {
-    protected String title;
+	private static final long serialVersionUID = 3092341965464094850L;
+	protected String title;
     protected String subject;
     protected String author;
     protected List<String> keywords;

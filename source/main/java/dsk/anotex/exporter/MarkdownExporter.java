@@ -34,26 +34,37 @@ public class MarkdownExporter implements AnnotationExporter {
         // TODO: Use specialized Markdown library if the requirements evolve
         // (currently this would be overkill).
         StringBuilder buf = new StringBuilder(1024);
-        if (document.getTitle() != null) {
-            buf.append("# ").append(document.getTitle()).append(" #");
+        if (document.getTitle() != null && document.getTitle().length()>0) {
+            buf.append("# ").append(document.getTitle());
             buf.append(BR);
             buf.append(BR);
         }
         String subject = document.getSubject();
-        if (subject != null) {
+        if (subject != null && subject.length()>0) {
             buf.append("\"").append(subject).append("\"");
             buf.append(BR);
         }
         List<String> keywords = document.getKeywords();
         if (!keywords.isEmpty()) {
-            buf.append(keywords);
-            buf.append(BR);
+            buf.append("_").append(keywords.stream().reduce((s1,s2) -> s1 +","+s2).get());
+            buf.append("_").append(BR);
         }
         buf.append(BR);
+        //Assuming that the page numbers are sequential and don't need to be sorted.
+        int currentPageNumber = -1;
         for (Annotation annotation : document.getAnnotations()) {
-            buf.append(annotation.getText());
-            buf.append(BR);
-        } //
+        	if(annotation.isEmpty()) continue;
+        	int page = annotation.getPage();
+        	if(page != currentPageNumber) {
+        		buf.append("**Page " + page + "**").append(BR);
+        		currentPageNumber = page;
+        	}
+        	if(annotation.getHighlight()!=null)
+        		buf.append(annotation.getHighlight()).append(BR);
+        	if(annotation.getText()!=null)
+        		buf.append(">").append(annotation.getText()).append(BR);
+        	buf.append(BR); //make the distinction between annotations clear. This break is also needed to end the cite.
+        }
         return buf.toString();
     }
 }
