@@ -3,8 +3,12 @@ package dsk.anotex;
 import dsk.anotex.core.FileFormat;
 import dsk.anotex.util.CommandLineParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Console runner for the application.
@@ -12,6 +16,7 @@ import java.util.Map;
 public class ConsoleRunner {
     // Recognized command line arguments.
     public static final String ARG_INPUT = "input";
+    public static final String ARG_PAGES = "pages";
     public static final String ARG_OUTPUT = "output";
     public static final String ARG_HELP = "help";
 
@@ -68,6 +73,42 @@ public class ConsoleRunner {
             + "additional arguments:\n"
             + String.format("-%s : Prints the supported command line arguments.\n", ARG_HELP);
     }
+    
+    private static int parseInt(String s) {
+		try {
+			return Integer.parseInt(s);
+		} catch(NumberFormatException e) {
+			throw new RuntimeException("Cannot parse '" + s + "' as integer");
+		}
+    }
+    
+    static final Pattern pattern = Pattern.compile("(\\d+)-(\\d+)");
+    private static ArrayList<Integer> parsePages(String pages) {
+    	ArrayList<Integer> pagenumbers = new ArrayList<Integer>();
+    	String[] cuts = pages.split(",");
+    	for(String cut : cuts) {
+    		Matcher match = pattern.matcher(cut);
+    		if(match.matches()) {
+    			int begin = parseInt(match.group(1));
+    			int end = parseInt(match.group(2));
+    			if(end<begin) continue;
+    			for(int i = begin; i <= end; i++)
+    				pagenumbers.add(i);
+    		} else 
+    			pagenumbers.add(parseInt(cut));
+    	}
+    	pagenumbers.sort(null);
+    	int number = -1;
+    	//remove duplicate and negative numbers
+    	for(Iterator<Integer> iter = pagenumbers.iterator(); iter.hasNext();) {
+    		int next = iter.next();
+    		if(number==next || next<0)
+    			iter.remove();
+    		else
+    			number = next;
+    	}
+    	return pagenumbers;
+    }
 
     /**
      * Execution entry point.
@@ -79,8 +120,8 @@ public class ConsoleRunner {
         runner.printMessage(runner.getStartMessage());
 
         // Parse the command line.
-        CommandLineParser parser = new CommandLineParser(args);
-        parser.parseArguments(args);
+        CommandLineParser parser = new CommandLineParser();
+        parser.parse(args);
 
         String inputFile = parser.getArgumentValue(ARG_INPUT);
         if ((inputFile != null)) {
@@ -89,6 +130,12 @@ public class ConsoleRunner {
             // Retrieve the output file name.
             String outputFile = parser.getArgumentValue(ARG_OUTPUT);
             settings.put(Constants.EXPORT_FORMAT, FileFormat.detectFileFormat(outputFile));
+            
+            /// Retrieve the pages to be extracted
+            String pages = parser.getArgumentValue(ARG_PAGES);
+            if(pages != null && pages.length()>0)
+            	settings.put(Constants.PAGES, parsePages(pages));
+            
             // Execute the annotation extraction.
             runner.doExtract(inputFile, settings, outputFile);
         }

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -35,7 +36,8 @@ public class AnnotationExtractor {
      */
     public String extractAnnotations(String inputFile, Map<String, Object> settings, String outputFile) {
         // Extract the annotations.
-        AnnotatedDocument document = readAnnotations(inputFile);
+        @SuppressWarnings("unchecked")
+		AnnotatedDocument document = readAnnotations(inputFile, (ArrayList<Integer>) settings.getOrDefault(Constants.PAGES, null));
 
         // Get appropriate exporter.
         FileFormat exportFormat = (FileFormat) settings.get(Constants.EXPORT_FORMAT);
@@ -59,15 +61,19 @@ public class AnnotationExtractor {
         return outputFile;
     }
 
+    public AnnotatedDocument readAnnotations(String fileName) {
+    	return readAnnotations(fileName, null);
+    }
+    
     /**
      * Read annotations from given document file.
      * @param fileName Document file name.
      * @return Document annotations.
      */
-    public AnnotatedDocument readAnnotations(String fileName) {
+    public AnnotatedDocument readAnnotations(String fileName, ArrayList<Integer> pages) {
         FileFormat format = FileFormat.detectFileFormat(fileName);
         AnnotationImporter importer = ImporterFactory.createImporter(format);
-        AnnotatedDocument document = importer.readAnnotations(fileName);
+        AnnotatedDocument document = importer.readAnnotations(fileName, pages);
         postProcess(document);
         return document;
     }

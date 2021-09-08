@@ -1,5 +1,7 @@
 package dsk.anotex.importer;
 
+import java.util.ArrayList;
+
 import dsk.anotex.core.AnnotatedDocument;
 
 /**
@@ -12,6 +14,6 @@ public interface AnnotationImporter {
      * @param fileName Document file name.
      * @return Document annotations.
      */
-    public AnnotatedDocument readAnnotations(String fileName);
+    public AnnotatedDocument readAnnotations(String fileName, ArrayList<Integer> pages);
 
 }

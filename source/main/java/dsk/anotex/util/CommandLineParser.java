@@ -29,15 +29,6 @@ public class CommandLineParser {
     }
 
     /**
-     * Constructor with specified parameters.
-     * @param args Command line arguments.
-     */
-    public CommandLineParser(String[] args) {
-        this();
-        parse(args);
-    }
-
-    /**
      * Parse specified command line arguments.
      * @param arguments Command line arguments.
      */
@@ -111,7 +102,7 @@ public class CommandLineParser {
      *
      * @return Map with parsed keys and values. Or empty map (if no command line options passed).
      */
-    public Map<String, String> parseArguments(String[] args) {
+    private Map<String, String> parseArguments(String[] args) {
         LinkedHashMap<String, String> arguments = new LinkedHashMap<>();
         if ((args == null) || (args.length == 0)) {
             // No parameters passed.

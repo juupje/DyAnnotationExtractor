@@ -1,4 +1,7 @@
 *.class
+*.pdf
+*.txt
+*.md
 
 # Eclipse stuff
 .classpath

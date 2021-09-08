@@ -19,6 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +30,7 @@ import java.util.List;
 public class PdfAnnotationImporter implements AnnotationImporter {
     protected Logger log = LogManager.getLogger(this.getClass());
 
-    public AnnotatedDocument readAnnotations(String fileName) {
+    public AnnotatedDocument readAnnotations(String fileName, ArrayList<Integer> pages) {
         // Check the file existence.
         File file = new File(fileName).getAbsoluteFile();
         if (!file.isFile()) {
@@ -39,7 +40,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
 
         // Extract the annotations.
         PdfDocument pdfDocument = readDocument(file);
-        return extractAnnotations(pdfDocument);
+        return extractAnnotations(pdfDocument, pages);
     }
 
     /**
@@ -63,7 +64,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
      * @param pdfDocument PDF document.
      * @return Extracted annotations.
      */
-    protected AnnotatedDocument extractAnnotations(PdfDocument pdfDocument) {
+    protected AnnotatedDocument extractAnnotations(PdfDocument pdfDocument, ArrayList<Integer> pages) {
         AnnotatedDocument document = new AnnotatedDocument();
         PdfDocumentInfo pdfInfo = pdfDocument.getDocumentInfo();
         document.setTitle(pdfInfo.getTitle());
@@ -74,18 +75,28 @@ public class PdfAnnotationImporter implements AnnotationImporter {
         document.setKeywords(keywords);
 
         List<Annotation> annotations = new LinkedList<>();
-        for (int i = 1; i <= pdfDocument.getNumberOfPages(); i++) {
-            PdfPage page = pdfDocument.getPage(i);
-            for (PdfAnnotation pdfAnnotation : page.getAnnotations()) {
-                Annotation annotation = convertAnnotation(pdfAnnotation, i);
-                if (annotation != null) {
-                    annotations.add(annotation);
-                }
-            } //
-        } //
+        if(pages == null) {
+	        for (int i = 1; i <= pdfDocument.getNumberOfPages(); i++)
+	            addAnnotationsFromPage(pdfDocument.getPage(i), i, annotations);
+        } else {
+        	for(int i = 0; i < pages.size(); i++) {
+        		int page = pages.get(i);
+        		if(page>pdfDocument.getNumberOfPages()) break;
+        		addAnnotationsFromPage(pdfDocument.getPage(page), page, annotations);
+        	}
+        }
         document.setAnnotations(annotations);
 
         return document;
+    }
+    
+    protected void addAnnotationsFromPage(PdfPage page, int pagenr, List<Annotation> annotations) {
+    	for (PdfAnnotation pdfAnnotation : page.getAnnotations()) {
+            Annotation annotation = convertAnnotation(pdfAnnotation, pagenr);
+            if (annotation != null) {
+                annotations.add(annotation);
+            }
+        }
     }
 
     /**
